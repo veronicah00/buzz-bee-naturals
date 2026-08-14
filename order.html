@@ -123,7 +123,7 @@
                 </div>
                 <div class="order-form">
                     <h3>Complete Your Order</h3>
-                    <div class="success-message" id="successMessage">✓ Order submitted successfully! Check WhatsApp for confirmation.</div>
+                    <div class="success-message" id="successMessage">✓ Order submitted successfully! Check your email for confirmation.</div>
                     <div class="error-message" id="errorMessage"></div>
                     <form id="orderForm">
                         <input type="hidden" id="selectedProduct" name="product">
@@ -179,7 +179,7 @@
     </section>
 
     <script>
-        window.backendApiUrl = 'https://buzzbee-backend.onrender.com/api';
+        window.backendApiUrl = '/api';
         const cartInfo = document.getElementById('cartInfo');
         const selectedProductInput = document.getElementById('selectedProduct');
         const selectedPriceInput = document.getElementById('selectedPrice');
@@ -257,14 +257,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
+                const result = await response.json().catch(() => null);
                 if (response.ok) {
+                    successMessage.textContent = result && result.message ? result.message : 'Order submitted successfully.';
                     successMessage.style.display = 'block';
                     errorMessage.style.display = 'none';
                     this.reset();
                     cart = null;
                     renderCart();
                 } else {
-                    const result = await response.json().catch(() => null);
                     const errorMessageText = (result && result.error) ? result.error : 'Failed to submit order';
                     throw new Error(errorMessageText);
                 }

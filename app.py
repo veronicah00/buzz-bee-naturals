@@ -9,7 +9,8 @@ from datetime import datetime
 import sqlite3
 import os
 import json
-import requests
+import smtplib
+from email.message import EmailMessage
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -20,10 +21,13 @@ CORS(app)
 
 # Database and notification configuration
 DB_PATH = 'buzzbee_orders.db'
-ADMIN_PHONE = os.getenv('ADMIN_PHONE', '254735754185')
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', '').strip()
+SMTP_SERVER = os.getenv('SMTP_SERVER', '').strip()
+SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
+SMTP_USERNAME = os.getenv('SMTP_USERNAME', '').strip()
+SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '').strip()
+SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'True').strip().lower() in ('1', 'true', 'yes', 'y')
+SMTP_FROM_EMAIL = os.getenv('SMTP_FROM_EMAIL', SMTP_USERNAME).strip()
 
 # Initialize database
 def init_db():
@@ -84,38 +88,27 @@ def add_default_products():
     conn.commit()
     conn.close()
 
-def normalize_phone(phone_number):
-    phone = str(phone_number).strip()
-    if phone.startswith('+'):
-        return phone
-    if phone.startswith('0') and len(phone) == 10:
-        return f'+254{phone[1:]}'
-    return f'+{phone}'
+def send_email_message(to_email, subject, message):
+    """Send an email notification when SMTP is configured; otherwise log the message."""
+    if not (SMTP_SERVER and SMTP_USERNAME and SMTP_PASSWORD and SMTP_FROM_EMAIL):
+        print(f"Email message to {to_email}:\nSubject: {subject}\n{message}")
+        return False
 
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = SMTP_FROM_EMAIL
+        msg['To'] = to_email
+        msg.set_content(message)
 
-def send_sms_message(phone_number, message):
-    """Send SMS notification via Twilio if configured, otherwise log message."""
-    normalized_phone = normalize_phone(phone_number)
-    if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_PHONE_NUMBER:
-        try:
-            payload = {
-                'From': TWILIO_PHONE_NUMBER,
-                'To': normalized_phone,
-                'Body': message
-            }
-            response = requests.post(
-                f'https://api.twilio.com/2010-04-01/Accounts/{TWILIO_ACCOUNT_SID}/Messages.json',
-                data=payload,
-                auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-            )
-            response.raise_for_status()
-            return True
-        except Exception as e:
-            print(f"Error sending SMS via Twilio: {e}")
-            print(f"SMS message to {normalized_phone}: {message}")
-            return False
-    else:
-        print(f"SMS message to {normalized_phone}: {message}")
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            if SMTP_USE_TLS:
+                server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email to {to_email}: {e}")
         return False
 
 @app.route('/')
@@ -180,13 +173,34 @@ Message: {data.get('message', 'N/A')}
 Order ID: {order_id}"""
 
         # Send notifications
-        send_sms_message(data['phone'], customer_message)
-        send_sms_message(ADMIN_PHONE, admin_message)
+        customer_notification_sent = send_email_message(
+            data['email'],
+            f'Buzz Bee Naturals Order Confirmation #{order_id}',
+            customer_message
+        )
+        admin_notification_sent = send_email_message(
+            ADMIN_EMAIL or SMTP_FROM_EMAIL,
+            f'New Buzz Bee Naturals Order #{order_id}',
+            admin_message
+        )
+
+        if customer_notification_sent and admin_notification_sent:
+            response_message = 'Order created successfully and confirmation emails sent.'
+        elif customer_notification_sent:
+            response_message = 'Order created successfully, but the admin confirmation email could not be sent.'
+        else:
+            response_message = 'Order created successfully, but email notifications could not be sent. Please configure SMTP settings.'
 
         return jsonify({
             'success': True,
-            'message': 'Order created successfully',
-            'order_id': order_id
+            'message': response_message,
+            'order_id': order_id,
+            'notifications': {
+                'customer_notification_sent': customer_notification_sent,
+                'admin_notification_sent': admin_notification_sent,
+                'channel': 'email',
+                'smtp_configured': bool(SMTP_SERVER and SMTP_USERNAME and SMTP_PASSWORD and SMTP_FROM_EMAIL)
+            }
         }), 201
 
     except Exception as e:

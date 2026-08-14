@@ -7,29 +7,32 @@ Your project is already pushed to:
 
 https://github.com/veronicah00/buzzbee.git
 
-## Step 2: Deploy the Flask backend to Render
-Render is a simple host for Python web apps.
+## Step 2: Deploy the app to Render
+Render is a simple host for Python web apps, and this project is already set up to serve the frontend and backend from the same app.
 
 1. Go to https://dashboard.render.com/
 2. Create an account or sign in.
 3. Click `New` → `Web Service`.
 4. Connect your GitHub account and select `veronicah00/buzzbee`.
 5. Configure the service:
-   - **Name**: buzzbee-backend
+   - **Name**: `buzzbee-backend`
    - **Region**: Choose the nearest region
    - **Branch**: `master`
    - **Root Directory**: leave empty
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
 6. Add environment variables:
-   - `ADMIN_PHONE` = `+254735754185`
-   - `TWILIO_ACCOUNT_SID` = `<your Twilio account SID>`
-   - `TWILIO_AUTH_TOKEN` = `<your Twilio auth token>`
-   - `TWILIO_PHONE_NUMBER` = `<your Twilio phone number>`
+   - `ADMIN_EMAIL` = `your-admin-email@example.com`
+   - `SMTP_SERVER` = `smtp.gmail.com`
+   - `SMTP_PORT` = `587`
+   - `SMTP_USERNAME` = `your-email@gmail.com`
+   - `SMTP_PASSWORD` = `your-app-password`
+   - `SMTP_USE_TLS` = `True`
+   - `SMTP_FROM_EMAIL` = `your-email@gmail.com`
    - `DEBUG` = `False`
 7. Click `Create Web Service`.
 
-Render will build and deploy your app, then provide a service URL.
+Render will build and deploy your app, then provide a public service URL.
 
 ### If Render fails to deploy
 - Open the Render deploy log details.
@@ -40,28 +43,22 @@ Render will build and deploy your app, then provide a service URL.
   - port or start command errors
 - This repo now includes `runtime.txt` and `Procfile` to support Render.
 
-## Step 3: Use the deployed backend URL in the frontend
-After Render deploys, copy the service URL, for example:
+## Step 3: Open the deployed site on your phone
+After Render deploys, open the provided service URL on your phone, for example:
 
 ```
 https://buzzbee-backend.onrender.com
 ```
 
-Then edit `order.html` and set:
-
-```js
-window.backendApiUrl = 'https://buzzbee-backend.onrender.com/api';
-```
-
-If you want me to update it automatically, provide the final Render service URL.
+The frontend is already configured to call `/api` from the same deployment, so you can test the order flow directly on your phone.
 
 ## Step 4: Test the live order flow
-1. Open the frontend page in a browser.
+1. Open the deployed page on your phone.
 2. Place an order.
 3. Confirm the order reaches the Flask backend and returns success.
-4. Confirm you receive a notification via Twilio or WhatsApp.
+4. Confirm you receive the confirmation email at the customer and admin addresses.
 
 ## Notes
 - GitHub Pages can host only the static front-end. The backend must be on a separate server (Render, Railway, etc.).
 - The current backend works locally and returns `201` for valid orders.
-- You may want to add a real WhatsApp integration provider later if you want WhatsApp messages instead of SMS.
+- If email delivery fails, check the Render logs and verify your SMTP username/password and app password settings.
