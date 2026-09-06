@@ -291,7 +291,7 @@ python app.py
 ## Support
 
 For issues or questions:
-- Email: info@buzzbeenaturals.com
+- Email: buzzbeenaturals@gmail.com
 - WhatsApp: +254 700 404 773
 
 ## License

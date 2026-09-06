@@ -21,11 +21,15 @@ CORS(app)
 
 # Database and notification configuration
 DB_PATH = 'buzzbee_orders.db'
-ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', '').strip()
-SMTP_SERVER = os.getenv('SMTP_SERVER', '').strip()
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'buzzbeenaturals@gmail.com').strip()
+SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com').strip()
 SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-SMTP_USERNAME = os.getenv('SMTP_USERNAME', '').strip()
-SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '').strip()
+SMTP_USERNAME = os.getenv('SMTP_USERNAME', 'buzzbeenaturals@gmail.com').strip()
+
+# Safely get the password and remove any spaces (even if copied with spaces)
+raw_password = os.getenv('SMTP_PASSWORD', '')
+SMTP_PASSWORD = ''.join(raw_password.split())
+
 SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'True').strip().lower() in ('1', 'true', 'yes', 'y')
 SMTP_FROM_EMAIL = os.getenv('SMTP_FROM_EMAIL', SMTP_USERNAME).strip()
 

@@ -399,7 +399,7 @@ BUZZBEE NATURALS/
 
 ## 📞 **Support**
 
-- **Email**: info@buzzbeenaturals.com
+- **Email**: buzzbeenaturals@gmail.com
 - **WhatsApp**: +254 700 404 773
 - **Documentation**: See README.md and SETUP.md
 

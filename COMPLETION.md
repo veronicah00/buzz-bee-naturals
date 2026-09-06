@@ -278,7 +278,7 @@ This website is **production-ready** and can be:
 
 **Company**: Buzz Bee Naturals  
 **WhatsApp**: +254 700 404 773  
-**Email**: info@buzzbeenaturals.com  
+**Email**: buzzbeenaturals@gmail.com
 
 ---
 

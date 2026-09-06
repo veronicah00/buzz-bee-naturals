@@ -177,7 +177,7 @@ Your website is now running with:
 ## 📞 Contact
 
 - **WhatsApp**: +254 700 404 773
-- **Email**: info@buzzbeenaturals.com
+- **Email**: buzzbeenaturals@gmail.com
 
 ---
 

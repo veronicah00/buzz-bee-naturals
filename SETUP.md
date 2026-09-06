@@ -327,7 +327,7 @@ pip install -r requirements.txt
 
 ## Support & Contact
 
-**Email**: info@buzzbeenaturals.com
+**Email**: buzzbeenaturals@gmail.com
 **WhatsApp**: +254 700 404 773
 **Website**: Will be available when deployed
 
