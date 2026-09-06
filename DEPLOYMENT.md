@@ -5,7 +5,7 @@ This document covers hosting the Flask backend and the static site.
 ## Step 1: Push code to GitHub
 Your project is already pushed to:
 
-https://github.com/veronicah00/buzzbee.git
+https://github.com/veronicah00/buzz-bee-naturals.git
 
 ## Step 2: Deploy the app to Render
 Render is a simple host for Python web apps, and this project is already set up to serve the frontend and backend from the same app.
@@ -13,16 +13,16 @@ Render is a simple host for Python web apps, and this project is already set up 
 1. Go to https://dashboard.render.com/
 2. Create an account or sign in.
 3. Click `New` → `Web Service`.
-4. Connect your GitHub account and select `veronicah00/buzzbee`.
+4. Connect your GitHub account and select `veronicah00/buzz-bee-naturals`.
 5. Configure the service:
    - **Name**: `buzzbee-backend`
    - **Region**: Choose the nearest region
-   - **Branch**: `master`
+   - **Branch**: `main`
    - **Root Directory**: leave empty
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
 6. Add environment variables:
-   - `ADMIN_EMAIL` = `your-admin-email@example.com`
+   - `ADMIN_EMAIL` = `wanjiruveronicah2023@gmail.com`
    - `SMTP_SERVER` = `smtp.gmail.com`
    - `SMTP_PORT` = `587`
    - `SMTP_USERNAME` = `your-email@gmail.com`
