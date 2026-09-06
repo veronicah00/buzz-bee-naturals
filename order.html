@@ -179,7 +179,7 @@
     </section>
 
     <script>
-        window.backendApiUrl = '/api';
+        window.backendApiUrl = 'https://buzzbee-naturals.onrender.com/api';
         const cartInfo = document.getElementById('cartInfo');
         const selectedProductInput = document.getElementById('selectedProduct');
         const selectedPriceInput = document.getElementById('selectedPrice');
@@ -252,7 +252,7 @@
             };
             try {
                 const backendUrl = window.backendApiUrl || '/api';
-            const response = await fetch(`${backendUrl}/order`, {
+                const response = await fetch(`${backendUrl}/order`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
@@ -270,7 +270,7 @@
                     throw new Error(errorMessageText);
                 }
             } catch (error) {
-                errorMessage.textContent = 'Error submitting order. Please try again.';
+                errorMessage.textContent = `Error submitting order: ${error.message}`;
                 errorMessage.style.display = 'block';
                 successMessage.style.display = 'none';
             }
